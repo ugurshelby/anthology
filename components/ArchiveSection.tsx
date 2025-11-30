@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Story } from "../types";
 import { mockStories } from "../data/mockData";
-import { buildHeroCandidates } from "../utils/images";
+import { buildHeroCandidates, buildLocalResponsiveSrcSet, defaultSizes } from "../utils/images";
 import {
   archiveCardContainer,
   archiveCardImage,
@@ -152,13 +152,15 @@ const ArchiveCard: React.FC<{
           <motion.img
             layoutId={`hero-image-${story.id}`}
             src={candidates[Math.min(candidateIndex, Math.max(0, candidates.length - 1))]}
-            srcSet={buildSrcSet(heroRaw)}
-            sizes="(min-width:1024px) 33vw, (min-width:768px) 50vw, 100vw"
+            srcSet={heroRaw.startsWith("https://images.unsplash.com/") ? buildSrcSet(heroRaw) : buildLocalResponsiveSrcSet(heroRaw)}
+            sizes={defaultSizes.archive}
             alt={`${story.title} — ${story.year}`}
             loading={index === 0 ? "eager" : "lazy"}
             fetchPriority={index === 0 ? "high" : index < 3 ? "high" : "low"}
             referrerPolicy="no-referrer"
             decoding="async"
+            width={1600}
+            height={900}
             onLoad={() => setLoaded(true)}
             onError={() => {
               const next = candidateIndex + 1;

@@ -72,3 +72,22 @@ export const buildContentCandidates = (url: string, caption: string) => {
   const aliases = (localContentCaptionAliases[caption] || []).map((n) => `/${n}`);
   return Array.from(new Set([...base, ...aliases]));
 };
+
+export const buildLocalResponsiveSrcSet = (url: string) => {
+  const name = baseNameFromUrl(url);
+  const stem = name.replace(/\.(jpg|jpeg|png|webp)$/i, '');
+  const small = `/${stem}-480.webp 480w`;
+  const medium = `/${stem}-1024.webp 1024w`;
+  const large = `/${stem}-1920.webp 1920w`;
+  return [small, medium, large].join(', ');
+};
+
+export const defaultSizes = {
+  archive: '(max-width:1024px) 50vw, (max-width:1600px) 33vw, 33vw',
+  modal: '(max-width:640px) 95vw, (max-width:1024px) 80vw, 60vw'
+};
+
+export const aspectForLayout = (layout: 'full' | 'portrait' | 'landscape') => {
+  if (layout === 'portrait') return { width: 1200, height: 1600 };
+  return { width: 1600, height: 900 };
+};

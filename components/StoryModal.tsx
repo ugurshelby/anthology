@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useMemo, useState } from 'react';
 import { motion, useScroll, useTransform, useSpring, useInView } from 'framer-motion';
 import { Story, StoryContent } from '../types';
-import { buildHeroCandidates, buildContentCandidates } from '../utils/images';
+import { buildHeroCandidates, buildContentCandidates, buildLocalResponsiveSrcSet, defaultSizes, aspectForLayout } from '../utils/images';
 
 interface StoryModalProps {
   story: Story;
@@ -307,15 +307,17 @@ const ImageBlock: React.FC<{ src: string; caption: string; layout: 'full' | 'por
         className="relative group"
       >
         {!errored && (
-          <img 
+            <img 
             src={candidates[Math.min(candidateIndex, Math.max(0, candidates.length - 1))]} 
-            srcSet={undefined}
-            sizes="(min-width:1024px) 60vw, 100vw"
+            srcSet={buildLocalResponsiveSrcSet(src)}
+            sizes={defaultSizes.modal}
             alt={caption} 
             loading="lazy"
             decoding="async"
             referrerPolicy="no-referrer"
             fetchPriority="low"
+            width={aspectForLayout(layout).width}
+            height={aspectForLayout(layout).height}
             onLoad={() => setLoaded(true)}
             onError={() => {
               const next = candidateIndex + 1;
