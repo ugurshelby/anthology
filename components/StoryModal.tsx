@@ -149,12 +149,25 @@ const StoryModal: React.FC<StoryModalProps> = ({ story, onClose }) => {
             style={{ y: heroY, scale: heroScale, filter: heroBlur }} 
             className="absolute inset-0 w-full h-full origin-center will-change-transform"
           >
-            <img 
-              src={heroSrc} 
-              className="w-full h-full object-cover"
-              alt="Hero"
-              onError={() => setHeroIndex((i) => i + 1)}
-            />
+            <picture className="block w-full h-full aspect-[16/9]">
+              {heroResolved.startsWith('https://images.unsplash.com/') ? (
+                <>
+                  <source media="(max-width: 640px)" srcSet={toSafeImageUrl(heroResolved).replace(/w=1600/, 'w=480')} type="image/webp" />
+                  <source media="(max-width: 1024px)" srcSet={toSafeImageUrl(heroResolved).replace(/w=1600/, 'w=1024')} type="image/webp" />
+                </>
+              ) : (
+                <>
+                  <source media="(max-width: 640px)" srcSet={getLocalWebpPath(heroResolved, 480)} type="image/webp" />
+                  <source media="(max-width: 1024px)" srcSet={getLocalWebpPath(heroResolved, 1024)} type="image/webp" />
+                </>
+              )}
+              <img 
+                src={heroSrc} 
+                className="w-full h-full object-cover"
+                alt="Hero"
+                onError={() => setHeroIndex((i) => i + 1)}
+              />
+            </picture>
             {/* Gradient Overlays for text readability */}
             <motion.div 
               style={{ opacity: heroDim }}

@@ -22,8 +22,8 @@ export const buildLocalCandidates = (url: string) => {
   const add = (n: string, e: string) => candidates.push(`/${n}${e}`);
   const stemUnderscore = stem.replace(/\s+/g, '_');
   exts.forEach((e) => {
-    add(stem, e);
     add(stemUnderscore, e);
+    add(stem, e);
   });
   return Array.from(new Set(candidates));
 };
@@ -75,11 +75,25 @@ export const buildContentCandidates = (url: string, caption: string) => {
 
 export const buildLocalResponsiveSrcSet = (url: string) => {
   const name = baseNameFromUrl(url);
-  const stem = name.replace(/\.(jpg|jpeg|png|webp)$/i, '');
+  const stem = name.replace(/\.(jpg|jpeg|png|webp)$/i, '').replace(/\s+/g, '_');
   const small = `/${stem}-480.webp 480w`;
   const medium = `/${stem}-1024.webp 1024w`;
   const large = `/${stem}-1920.webp 1920w`;
   return [small, medium, large].join(', ');
+};
+
+export const getLocalWebpPath = (url: string, width: 480 | 1024 | 1920) => {
+  const name = baseNameFromUrl(url);
+  const stem = name.replace(/\.(jpg|jpeg|png|webp)$/i, '').replace(/\s+/g, '_');
+  return `/${stem}-${width}.webp`;
+};
+
+export const getUnsplashVariant = (url: string, width: 480 | 1024 | 1920) => {
+  const u = new URL(url);
+  u.searchParams.set('w', String(width));
+  u.searchParams.set('fm', 'webp');
+  u.searchParams.set('q', '80');
+  return '/unsplash' + u.pathname + (u.search || '');
 };
 
 export const defaultSizes = {

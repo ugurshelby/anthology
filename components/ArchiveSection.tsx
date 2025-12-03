@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Story } from "../types";
 import { mockStories } from "../data/mockData";
-import { buildHeroCandidates, buildLocalResponsiveSrcSet, defaultSizes } from "../utils/images";
+import { buildHeroCandidates, buildLocalResponsiveSrcSet, defaultSizes, getLocalWebpPath, getUnsplashVariant } from "../utils/images";
 import {
   archiveCardContainer,
   archiveCardImage,
@@ -149,28 +149,39 @@ const ArchiveCard: React.FC<{
           </div>
         )}
         {!error && (
-          <motion.img
-            layoutId={`hero-image-${story.id}`}
-            src={candidates[Math.min(candidateIndex, Math.max(0, candidates.length - 1))]}
-            srcSet={heroRaw.startsWith("https://images.unsplash.com/") ? buildSrcSet(heroRaw) : buildLocalResponsiveSrcSet(heroRaw)}
-            sizes={defaultSizes.archive}
-            alt={`${story.title} — ${story.year}`}
-            loading={index === 0 ? "eager" : "lazy"}
-            fetchPriority={index === 0 ? "high" : index < 3 ? "high" : "low"}
-            referrerPolicy="no-referrer"
-            decoding="async"
-            width={1600}
-            height={900}
-            onLoad={() => setLoaded(true)}
-            onError={() => {
-              const next = candidateIndex + 1;
-              if (next < candidates.length) { setCandidateIndex(next); return; }
-              setError(true);
-            }}
-            className={`${loaded ? archiveCardImage : "opacity-0"} ${
-              loaded ? "" : ""
-            }`}
-          />
+          <picture className="block w-full h-full aspect-[16/9]">
+            {heroRaw.startsWith("https://images.unsplash.com/") ? (
+              <>
+                <source media="(max-width: 640px)" srcSet={getUnsplashVariant(heroRaw, 480)} type="image/webp" />
+                <source media="(max-width: 1024px)" srcSet={getUnsplashVariant(heroRaw, 1024)} type="image/webp" />
+              </>
+            ) : (
+              <>
+                <source media="(max-width: 640px)" srcSet={getLocalWebpPath(heroRaw, 480)} type="image/webp" />
+                <source media="(max-width: 1024px)" srcSet={getLocalWebpPath(heroRaw, 1024)} type="image/webp" />
+              </>
+            )}
+            <motion.img
+              layoutId={`hero-image-${story.id}`}
+              src={candidates[Math.min(candidateIndex, Math.max(0, candidates.length - 1))]}
+              srcSet={heroRaw.startsWith("https://images.unsplash.com/") ? buildSrcSet(heroRaw) : buildLocalResponsiveSrcSet(heroRaw)}
+              sizes={defaultSizes.archive}
+              alt={`${story.title} — ${story.year}`}
+              loading={index === 0 ? "eager" : "lazy"}
+              fetchPriority={index === 0 ? "high" : index < 3 ? "high" : "low"}
+              referrerPolicy="no-referrer"
+              decoding="async"
+              width={1600}
+              height={900}
+              onLoad={() => setLoaded(true)}
+              onError={() => {
+                const next = candidateIndex + 1;
+                if (next < candidates.length) { setCandidateIndex(next); return; }
+                setError(true);
+              }}
+              className={`${loaded ? archiveCardImage : "opacity-0"}`}
+            />
+          </picture>
         )}
         {error && (
           <div className="absolute inset-0 flex items-center justify-center bg-[#111] text-white">
